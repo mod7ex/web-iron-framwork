@@ -75,7 +75,7 @@ impl PostFeedHandler {
 
 impl Handler for PostFeedHandler {
     fn handle(&self, _: &mut Request) -> IronResult<Response> {
-        let payload = try_handler!(serde_json::to_string(lock!(self.database).posts()));
+        let payload = try_handler!(serde_json::to_string(lock!(&self.database).posts()));
         Ok(Response::with((status::Ok, payload)))
     }
 }
@@ -97,7 +97,7 @@ impl Handler for PostPostHandler {
 
         let post = try_handler!(serde_json::from_str(payload.as_str()), status::BadRequest);
 
-        lock!(self.database).add_post(post);
+        lock!(&self.database).add_post(post);
         Ok(Response::with((status::Created, payload)))
     }
 }
@@ -112,7 +112,7 @@ impl PostHandler {
     }
 
     fn find_post(&self, id: &Uuid) -> Option<Post> {
-        let locked = lock!(self.database);
+        let locked = lock!(&self.database);
         let mut iterator = locked.posts().iter();
         iterator.find(|p| p.uuid() == id).map(|p| p.clone())
     }

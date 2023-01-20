@@ -17,6 +17,7 @@ fn main() {
     let (logger_before, logger_after) = Logger::new(None);
 
     let mut db = Database::new();
+    
     let p = Post::new(
         "The First Post",
         "This is the first post in our API",
@@ -24,6 +25,7 @@ fn main() {
         chrono::offset::Utc::now(),
         Uuid::new_v4(),
     );
+
     db.add_post(p);
 
     let p2 = Post::new(
@@ -33,6 +35,7 @@ fn main() {
         chrono::offset::Utc::now(),
         Uuid::new_v4(),
     );
+
     db.add_post(p2);
 
     let handlers = Handlers::new(db);
@@ -47,6 +50,6 @@ fn main() {
     chain.link_before(logger_before);
     chain.link_after(json_content_middleware);
     chain.link_after(logger_after);
-
+    
     Iron::new(chain).http("localhost:8000").unwrap();
 }
